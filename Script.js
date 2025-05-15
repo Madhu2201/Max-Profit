@@ -1,35 +1,63 @@
-function maxProfit(n) {
-    const buildings = [
-      { type: "T", time: 5, profit: 1500 },
-      { type: "P", time: 4, profit: 1000 },
-      { type: "C", time: 10, profit: 3000 }
+
+function maxProfit(timeUnits) {
+    const properties = [
+        { type: 'T', time: 5, earnings: 1500 },
+        { type: 'P', time: 4, earnings: 1000 },
+        { type: 'C', time: 10, earnings: 3000 }
     ];
-    let dp = Array(n + 1).fill(null).map(() => ({
-      profit: 0,
-      combo: { T: 0, P: 0, C: 0 }
-    }));
-  
-    for (let i = 1; i <= n; i++) {
-      for (const b of buildings) {
-        if (i >= b.time) {
-          const prev = dp[i - b.time];
-          const newProfit = prev.profit + b.profit;
-  
-          if (newProfit > dp[i].profit) {
-            dp[i].profit = newProfit;
-            dp[i].combo = { ...prev.combo };
-            dp[i].combo[b.type]++;
-          }
+
+    let maxEarnings = 0;
+    let solutions = [];
+
+    const maxT = Math.floor(timeUnits / properties[0].time);
+    const maxP = Math.floor(timeUnits / properties[1].time);
+    const maxC = Math.floor(timeUnits / properties[2].time);
+
+    for (let t = 0; t <= maxT; t++) {
+        for (let p = 0; p <= maxP; p++) {
+            for (let c = 0; c <= maxC; c++) {
+                const buildOrder = [];
+
+                for (let i = 0; i < t; i++) buildOrder.push(properties[0]);
+                for (let i = 0; i < p; i++) buildOrder.push(properties[1]);
+                for (let i = 0; i < c; i++) buildOrder.push(properties[2]);
+
+                let currentTime = 0;
+                let earnings = 0;
+                let possible = true;
+
+                for (const building of buildOrder) {
+                    const readyTime = currentTime + building.time;
+                    if (readyTime > timeUnits) {
+                        possible = false;
+                        break;
+                    }
+                    const activeTime = timeUnits - readyTime;
+                    earnings += building.earnings * activeTime;
+                    currentTime = readyTime;
+                }
+
+                if (!possible) continue;
+
+                if (earnings > maxEarnings) {
+                    maxEarnings = earnings;
+                    solutions = [[t, p, c]];
+                } else if (earnings === maxEarnings) {
+                    solutions.push([t, p, c]);
+                }
+            }
         }
-      }
-    } 
-    const result = dp[n];
-    console.log(`Time: ${n}, Profit: $${result.profit}`);
-    console.log(`T: ${result.combo.T}, P: ${result.combo.P}, C: ${result.combo.C}`);
-  }
-  
- 
-  maxProfit(7);   
-  maxProfit(8);   
-  maxProfit(13);  
-  
+    }
+
+    const formattedSolutions = solutions.map(([t, p, c]) => `T: ${t} P: ${p} C: ${c}`);
+
+    return {
+        earnings: maxEarnings,
+        solutions: formattedSolutions
+    };
+}
+
+// ✅ Test cases
+console.log(maxProfit(7));   // { earnings: 3000, solutions: ['T: 0 P: 0 C: 0'] }
+console.log(maxProfit(8));   // { earnings: 4000, solutions: ['T: 0 P: 1 C: 0'] }
+console.log(maxProfit(13));  // { earnings: 16500, solutions: ['T: 2 P: 0 C: 0'] }
