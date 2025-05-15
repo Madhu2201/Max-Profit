@@ -57,7 +57,6 @@ function maxProfit(timeUnits) {
     };
 }
 
-// ✅ Test cases
-console.log(maxProfit(7));   // { earnings: 3000, solutions: ['T: 0 P: 0 C: 0'] }
-console.log(maxProfit(8));   // { earnings: 4000, solutions: ['T: 0 P: 1 C: 0'] }
-console.log(maxProfit(13));  // { earnings: 16500, solutions: ['T: 2 P: 0 C: 0'] }
+console.log(maxProfit(7));   
+console.log(maxProfit(8));   
+console.log(maxProfit(13));  
